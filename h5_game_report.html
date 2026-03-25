@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI와 TypeScript가 견인하는 글로벌 H5 게임 산업 보고서</title>
+<meta name="robots" content="noindex, nofollow"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root, [data-theme="dark"] {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --border: rgba(255,255,255,0.07);
+    --border-subtle: rgba(255,255,255,0.03);
+    --text: #e8eaf0;
+    --text-sub: #c9d1e8;
+    --text-muted: #9ca3af;
+    --muted: #6b7280;
+    --accent-blue: #4f8ef7;
+    --accent-green: #34d399;
+    --accent-purple: #a78bfa;
+    --accent-amber: #fbbf24;
+    --accent-teal: #2dd4bf;
+    --accent-red: #f87171;
+    --title-em: #8ba8e8;
+    --core-bg: linear-gradient(135deg, rgba(79,142,247,0.07), rgba(45,212,191,0.04));
+    --core-border: rgba(79,142,247,0.18);
+    --glow-color: rgba(79,142,247,0.08);
+    --grid-color: rgba(79,142,247,0.025);
+    --toggle-bg: #1a1e28;
+    --toggle-border: rgba(255,255,255,0.1);
+    --tag-bg: rgba(79,142,247,0.1);
+    --tag-border: rgba(79,142,247,0.2);
+  }
+  [data-theme="light"] {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --surface2: #f0f2f8;
+    --border: rgba(0,0,0,0.08);
+    --border-subtle: rgba(0,0,0,0.04);
+    --text: #111827;
+    --text-sub: #1e2a45;
+    --text-muted: #4b5563;
+    --muted: #9ca3af;
+    --accent-blue: #2563eb;
+    --accent-green: #059669;
+    --accent-purple: #7c3aed;
+    --accent-amber: #d97706;
+    --accent-teal: #0d9488;
+    --accent-red: #dc2626;
+    --title-em: #2563eb;
+    --core-bg: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(13,148,136,0.03));
+    --core-border: rgba(37,99,235,0.15);
+    --glow-color: rgba(37,99,235,0.06);
+    --grid-color: rgba(37,99,235,0.03);
+    --toggle-bg: #ffffff;
+    --toggle-border: rgba(0,0,0,0.1);
+    --tag-bg: rgba(37,99,235,0.08);
+    --tag-border: rgba(37,99,235,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { transition: background 0.3s, color 0.3s; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow {
+    position: fixed;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 280px;
+    background: radial-gradient(ellipse, var(--glow-color) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.3s;
+  }
+
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 36px 24px 56px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 100;
+    background: var(--toggle-bg);
+    border: 1px solid var(--toggle-border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .theme-toggle:hover { color: var(--text); border-color: var(--accent-blue); }
+
+  @media print { .theme-toggle { display: none !important; } }
+
+  /* -- HEADER -- */
+  .report-header {
+    padding: 32px 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .report-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal), var(--accent-purple));
+  }
+
+  .label {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: var(--accent-blue);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .report-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+    color: var(--text);
+    line-height: 1.2;
+    margin-bottom: 12px;
+  }
+  .report-title em {
+    font-style: italic;
+    color: var(--title-em);
+  }
+
+  .report-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-style: italic;
+    padding: 12px 16px;
+    background: var(--core-bg);
+    border: 1px solid var(--core-border);
+    border-left: 3px solid var(--accent-blue);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .report-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .meta-tag {
+    font-size: 0.72rem;
+    color: var(--accent-teal);
+    padding: 3px 10px;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    border-radius: 20px;
+  }
+
+  /* -- SECTION -- */
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin: 32px 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* -- CONTENT CARD -- */
+  .content-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, border-color 0.2s;
+  }
+  .content-card:hover { border-color: rgba(79,142,247,0.3); }
+  .content-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: linear-gradient(90deg, var(--accent-blue), transparent);
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon { font-size: 1.1rem; }
+
+  .card-text {
+    font-size: 0.82rem;
+    color: var(--text-sub);
+    line-height: 1.75;
+  }
+  .card-text p { margin-bottom: 10px; }
+  .card-text p:last-child { margin-bottom: 0; }
+
+  /* -- TABLE -- */
+  .table-wrap {
+    overflow-x: auto;
+    margin: 14px 0;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  thead {
+    background: var(--surface2);
+  }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 700;
+    color: var(--accent-blue);
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    color: var(--text-sub);
+    border-bottom: 1px solid var(--border-subtle);
+    line-height: 1.5;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(79,142,247,0.03); }
+
+  /* -- STAT GRID -- */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin: 14px 0;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--accent-blue); }
+  .stat-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.6rem;
+    color: var(--accent-blue);
+    margin-bottom: 4px;
+  }
+  .stat-value.green { color: var(--accent-green); }
+  .stat-value.amber { color: var(--accent-amber); }
+  .stat-value.purple { color: var(--accent-purple); }
+  .stat-value.teal { color: var(--accent-teal); }
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* -- LIST -- */
+  .card-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 10px 0;
+  }
+  .card-list li {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    padding-left: 14px;
+    position: relative;
+  }
+  .card-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+  }
+  .card-list li strong { color: var(--text-sub); font-weight: 600; }
+  .card-list.green li::before { background: var(--accent-green); }
+  .card-list.amber li::before { background: var(--accent-amber); }
+  .card-list.purple li::before { background: var(--accent-purple); }
+
+  /* -- HIGHLIGHT BOX -- */
+  .highlight-box {
+    padding: 16px 20px;
+    background: var(--core-bg);
+    border: 1px solid var(--core-border);
+    border-left: 3px solid var(--accent-blue);
+    border-radius: 0 10px 10px 0;
+    margin: 14px 0;
+    font-size: 0.82rem;
+    color: var(--text-sub);
+    line-height: 1.7;
+  }
+  .highlight-box.warn {
+    border-left-color: var(--accent-amber);
+  }
+  .highlight-box.danger {
+    border-left-color: var(--accent-red);
+  }
+
+  /* -- TWO COL -- */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* -- PLATFORM CARD -- */
+  .platform-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    transition: border-color 0.2s;
+  }
+  .platform-card:hover { border-color: var(--accent-blue); }
+  .platform-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .platform-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* -- RANK TABLE -- */
+  .rank-num {
+    font-weight: 700;
+    color: var(--accent-amber);
+    font-size: 0.82rem;
+  }
+  .rank-num.top { color: var(--accent-green); }
+
+  /* -- STRATEGY CARD -- */
+  .strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 640px) { .strategy-grid { grid-template-columns: 1fr; } }
+
+  .strategy-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: border-color 0.2s;
+  }
+  .strategy-card:hover { border-color: var(--accent-blue); }
+  .strategy-card::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    margin-bottom: 10px;
+    border-radius: 2px;
+  }
+  .st1::before { background: var(--accent-blue); }
+  .st2::before { background: var(--accent-green); }
+  .st3::before { background: var(--accent-amber); }
+  .st4::before { background: var(--accent-purple); }
+  .strategy-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .strategy-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* -- FOOTER -- */
+  .report-footer {
+    text-align: center;
+    margin-top: 36px;
+    padding: 20px;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 20px 14px 40px; }
+    .report-header { padding: 22px 18px; }
+    .content-card { padding: 16px 18px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<button class="theme-toggle" onclick="
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  this.textContent = t === 'dark' ? '// light' : '// dark';
+">// light</button>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="report-header">
+    <div class="label">Industry Deep-Dive Report</div>
+    <h1 class="report-title">AI와 TypeScript가 견인하는<br/>글로벌 <em>H5 게임 산업</em>의 대전환</h1>
+    <div class="report-subtitle">
+      기술적 산업화와 시장 동향에 관한 심층 분석 보고서 &mdash; HTML5 게임의 재강림과 기술적 패러다임의 변화
+    </div>
+    <div class="report-meta">
+      <span class="meta-tag">2026 H1</span>
+      <span class="meta-tag">AI &middot; TypeScript &middot; H5</span>
+      <span class="meta-tag">Market Analysis</span>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9670;</span> 서론: HTML5 게임의 재강림</div>
+    <div class="card-text">
+      <p>글로벌 게임 산업은 지난 10년간 모바일 애플리케이션 중심의 생태계에서 웹 브라우저 기반의 즉각적인 접근성을 강조하는 HTML5(H5) 생태계로 그 무게중심이 이동하는 중요한 전환점에 서 있다.</p>
+      <p>과거 어도비 플래시의 종말 이후 단순한 캐주얼 게임의 전유물로 여겨졌던 H5 게임은 이제 <strong>인공지능(AI)</strong>과 <strong>TypeScript</strong>라는 강력한 기술적 도구를 만나 <strong>'산업화(Industrialization)'</strong>의 단계로 진입했다.</p>
+    </div>
+    <div class="highlight-box">
+      별도의 다운로드 없이 즉시 실행 가능한 '인스턴트 플레이' 모델은 앱 마켓의 높은 수수료와 설치 장벽을 우회하려는 전략적 움직임과 맞물려 글로벌 엔터테인먼트 시장의 핵심 동력으로 자리 잡았다.
+    </div>
+  </div>
+
+  <!-- MARKET SIZE -->
+  <div class="section-label">01 &mdash; Market Size &amp; Growth</div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">$10.3B</div>
+      <div class="stat-label">2024 협의 시장 규모</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value green">$1.15T</div>
+      <div class="stat-label">2025 광의 시장 추산</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value amber">17.4%</div>
+      <div class="stat-label">CAGR (협의, ~2035)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value purple">64%+</div>
+      <div class="stat-label">인스턴트 플레이 선호율</div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9670;</span> 시장 성장세 및 지역별 동향</div>
+    <div class="card-text">
+      <p>H5 게임 시장은 2026~2035년 약 <strong>9.49%~17.4%</strong>의 CAGR을 기록할 전망이다. 북미와 유럽이 기술적 성숙도를 바탕으로 전체 시장의 약 55%를 점유하나, 중국을 필두로 한 아시아-태평양 지역이 35%를 차지하며 강력한 추격세를 보이고 있다.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>시장 지표</th><th>2024/2025 실적</th><th>2026 예상</th><th>2032/2035 전망</th><th>CAGR</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>글로벌 H5 (광의)</strong></td><td>USD 1,150.78B</td><td>USD 1,260B</td><td>USD 2,849.3B</td><td>9.49%</td></tr>
+          <tr><td><strong>글로벌 H5 (협의)</strong></td><td>USD 1.205B</td><td>USD 1.414B</td><td>USD 9.82B</td><td>17.4%</td></tr>
+          <tr><td><strong>위챗 미니게임</strong></td><td>RMB 53.5B</td><td>성장세 지속</td><td>&mdash;</td><td>34.39%</td></tr>
+          <tr><td><strong>텔레그램 광고</strong></td><td>USD 10B</td><td>&mdash;</td><td>&mdash;</td><td>&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TYPESCRIPT -->
+  <div class="section-label">02 &mdash; TypeScript: 기술적 산업화의 핵심</div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9670;</span> TypeScript 프레임워크의 진화</div>
+    <div class="card-text">
+      <p>Cocos Creator와 같은 선도적인 H5 게임 엔진은 TypeScript를 기본 스크립팅 언어로 채택하여 개발자들에게 '사용하기 쉽고 디버깅이 용이한' 환경을 제공하고 있다. 특히 2026년 초 출시된 <strong>COCOS 4</strong>는 엔진과 에디터를 분리하고 완전 오픈 소스화(MIT 라이선스)함으로써, TypeScript 기반의 개발 생태계를 AI가 더 잘 이해하고 지원할 수 있는 구조로 재편했다.</p>
+    </div>
+    <ul class="card-list">
+      <li><strong>복잡한 로직의 구현 가능성</strong> &mdash; 대규모 SLG, MMO의 핵심 엔진 로직을 안정적으로 구동</li>
+      <li><strong>크로스 플랫폼 최적화</strong> &mdash; 위챗, 텔레그램, 웹 브라우저, 네이티브 앱으로 한 번의 코드 작성으로 전환</li>
+      <li><strong>AI와의 호환성</strong> &mdash; 명확한 타입 정의로 AI 코딩 어시스턴트의 정확도를 비약적으로 향상</li>
+    </ul>
+  </div>
+
+  <!-- AI -->
+  <div class="section-label">03 &mdash; AI 기술이 주도하는 게임 제작 혁신</div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">79%</div>
+      <div class="stat-label">AI 도구 긍정 반응 개발자</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value green">26.9%</div>
+      <div class="stat-label">AI가 작성한 코드 비율</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value amber">50%+</div>
+      <div class="stat-label">에셋 제작 시간 단축</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value purple">70%</div>
+      <div class="stat-label">버그 식별 속도 향상</div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9670;</span> AI 적용 분야별 영향</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>AI 적용 분야</th><th>효율성 영향 및 성과</th><th>관련 기술 및 도구</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>에셋 생성</strong></td><td>텍스처 및 UI 디자인 시간 50% 이상 단축</td><td>Stable Diffusion, Midjourney</td></tr>
+          <tr><td><strong>코딩 및 로직</strong></td><td>전체 생산 코드의 26.9%가 AI에 의해 작성</td><td>GitHub Copilot, Cursor, ChatGPT</td></tr>
+          <tr><td><strong>품질 보증(QA)</strong></td><td>수동 테스트 대비 주요 버그 식별 속도 70% 향상</td><td>자동화된 AI 에이전트</td></tr>
+          <tr><td><strong>NPC 행동/내러티브</strong></td><td>LLM을 통한 동적 대화 생성</td><td>GPT-4/5 기반 에이전트</td></tr>
+          <tr><td><strong>현지화</strong></td><td>자동화된 다국어 컴파일 및 번역 서비스</td><td>AI 번역 엔진 통합</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9888;</span> 생산성 역설과 품질 관리의 과제</div>
+    <div class="highlight-box warn">
+      AI 코딩 도구를 사용할 때 개발 속도는 30~80% 빨라지지만, 아키텍처 오류 검토와 코드 보안성 확인에 소요되는 시간이 늘어나 실제 생산성 증가는 10% 수준에 머물고 있다.
+    </div>
+    <ul class="card-list amber">
+      <li>AI가 생성한 코드는 숙련도가 낮은 개발자의 학습 능력을 저하시킬 수 있음</li>
+      <li>보안 스캔 결과 심각한 취약점이 수동 작성 코드보다 <strong>2.5배 높음</strong></li>
+      <li>'생산성 고착 상태(Productivity plateau)' 현상 관찰</li>
+    </ul>
+  </div>
+
+  <!-- PLATFORM -->
+  <div class="section-label">04 &mdash; 플랫폼 생태계 분석</div>
+
+  <div class="two-col" style="margin-bottom: 14px;">
+    <div class="platform-card">
+      <div class="platform-name">&#128242; 위챗 미니게임</div>
+      <div class="platform-desc">
+        <strong>MAU 5억+</strong> &middot; 고정 사용자 층 27% 증가<br/>
+        분기 매출 1,000만 위안 이상 타이틀 300개+<br/>
+        여성 타겟 게임 성장률이 남성 타겟 대비 2배<br/>
+        WeChat Pay + 소셜 공유 완벽 결합
+      </div>
+    </div>
+    <div class="platform-card">
+      <div class="platform-name">&#128640; 텔레그램 &amp; TON</div>
+      <div class="platform-desc">
+        <strong>사용자 10억 명</strong> &middot; 절반이 미니 앱 이용<br/>
+        TON 블록체인 기반 암호화폐 결제 통합<br/>
+        AI 기반 앱 17%+ 성장세<br/>
+        도구/유틸리티 중심으로 재편 중
+      </div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="platform-card">
+      <div class="platform-name">&#127760; Poki &amp; CrazyGames</div>
+      <div class="platform-desc">
+        각 MAU ~3,000만 명<br/>
+        마케팅 비용 없이 플랫폼 트래픽만으로 수익 제공<br/>
+        서구권 대표 H5 게임 허브
+      </div>
+    </div>
+    <div class="platform-card">
+      <div class="platform-name">&#9654; YouTube Playables</div>
+      <div class="platform-desc">
+        영상 시청 중 즉각적 게임 전환<br/>
+        플랫폼 간 경계 붕괴 가속화<br/>
+        H5 게임 시장 본격 진입
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIENCE -->
+  <div class="section-label">05 &mdash; 오디언스 특성 &amp; 수익 구조</div>
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">65%</div>
+      <div class="stat-label">모바일 사용자 비중</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value teal">20%</div>
+      <div class="stat-label">PC 사용자 (고가치)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value purple">15%</div>
+      <div class="stat-label">태블릿 사용자</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value amber">46%</div>
+      <div class="stat-label">IAA 수익 점유율</div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9670;</span> 수익 구조: IAA에서 하이브리드로</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>수익 모델</th><th>시장 점유율 및 특징</th><th>핵심 전략</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>IAA (광고 지원)</strong></td><td>약 46% 점유, 보상형 광고 60%+ 비중</td><td>시청 보상 최적화</td></tr>
+          <tr><td><strong>IAP (인앱 결제)</strong></td><td>성장세 가속, 결제 침투율 50% 증가</td><td>캐릭터 성장 및 아이템 구매 유도</td></tr>
+          <tr><td><strong>하이브리드</strong></td><td>미드코어 장르의 표준</td><td>'가벼운 진입, 깊은 몰입' 전략</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TOP TITLES -->
+  <div class="section-label">06 &mdash; 인기 장르 &amp; 대표 타이틀</div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9670;</span> "가벼운 진입, 깊은 몰입"의 미학</div>
+    <div class="card-text">
+      <p>중국 시장에서는 <strong>77%</strong>의 상위 위챗 미니게임이 MMO 또는 SLG 수준의 심도 있는 시스템을 통합하고 있다. 초기 사용자를 퍼즐이나 타워 디펜스 같은 쉬운 미니게임으로 유인한 뒤, 핵심 루프에서 강력한 성장과 경쟁 요소를 제공하여 장기 리텐션과 매출을 확보한다.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>게임 타이틀</th><th>2025 매출</th><th>장르 및 성공 요인</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="rank-num top">1</span></td><td><strong>Honor of Kings</strong></td><td>$1.68B</td><td>MOBA, 중국 내 압도적 점유율</td></tr>
+          <tr><td><span class="rank-num top">2</span></td><td><strong>Last War: Survival</strong></td><td>$1.57B</td><td>하이브리드 전략, 미니게임+SLG 결합</td></tr>
+          <tr><td><span class="rank-num top">3</span></td><td><strong>Whiteout Survival</strong></td><td>$1.40B</td><td>전략, 글로벌 동시 흥행</td></tr>
+          <tr><td><span class="rank-num">4</span></td><td><strong>Royal Match</strong></td><td>$1.37B</td><td>퍼즐, 높은 그래픽 품질</td></tr>
+          <tr><td><span class="rank-num">5</span></td><td><strong>Candy Crush Saga</strong></td><td>$1.00B</td><td>퍼즐, 장수 IP 브랜드 파워</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REGULATION -->
+  <div class="section-label">07 &mdash; 규제 환경 &amp; 윤리적 가이드라인</div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#9888;</span> AI 생성 콘텐츠의 투명성 요구</div>
+    <div class="highlight-box danger">
+      2026년부터 중국 사이버보안법 개정안과 EU AI 법이 AI 생성 콘텐츠에 대해 기계 판독 가능한 '워터마크' 삽입을 의무화. 위반 시 강력한 제재 조치.
+    </div>
+    <ul class="card-list amber">
+      <li><strong>중국 사이버보안법 개정안</strong> &mdash; 2026년 1월 발효, AIGC 워터마크 의무화</li>
+      <li><strong>EU AI 법</strong> &mdash; 2026년 8월 전면 시행, AI 생성 이미지/음성/텍스트 라벨링</li>
+      <li><strong>플랫폼 조치</strong> &mdash; AI 사칭/부정 상호작용 계정 영구 정지</li>
+    </ul>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title"><span class="icon">&#128274;</span> 데이터 프라이버시와 보안 위협</div>
+    <ul class="card-list">
+      <li>H5 게임의 브라우저 환경은 악성 봇/피싱 공격에 취약</li>
+      <li>텔레그램 iGaming 앱 확장으로 베트남, 네팔, 케냐 등에서 <strong>국가 차원 서비스 차단</strong> 발생</li>
+      <li>AI 코딩 어시스턴트 사용 중 핵심 로직/API 키 외부 유출 위험</li>
+      <li><strong>온프레미스 + 클라우드 하이브리드 아키텍처</strong>가 2026년 표준 보안 전략으로 부상</li>
+    </ul>
+  </div>
+
+  <!-- FUTURE -->
+  <div class="section-label">08 &mdash; 미래 전망 (2026~2035)</div>
+
+  <div class="two-col">
+    <div class="content-card">
+      <div class="card-title"><span class="icon">&#9729;</span> 클라우드 게이밍과의 결합</div>
+      <div class="card-text">
+        <p>하드웨어 사양에 구애받지 않고 실시간 렌더링 데이터를 브라우저로 스트리밍하는 방식이 보편화되면서, H5 환경에서도 <strong>AAA급 그래픽</strong>을 경험할 수 있는 시대가 열리고 있다.</p>
+      </div>
+      <div class="stat-grid" style="margin-top:12px;">
+        <div class="stat-card">
+          <div class="stat-value green">60%</div>
+          <div class="stat-label">클라우드 게임 경험률</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value teal">80%</div>
+          <div class="stat-label">긍정적 반응</div>
+        </div>
+      </div>
+    </div>
+    <div class="content-card">
+      <div class="card-title"><span class="icon">&#129302;</span> AI 에이전트 기반 개인화</div>
+      <div class="card-text">
+        <p>AI는 단순한 제작 도구를 넘어 게임 내 세계를 살아 움직이게 만드는 <strong>'에이전트'</strong>로 진화할 것이다. LLM을 탑재한 NPC는 사용자의 행동을 기억하고 학습하여 매번 다른 대화와 시나리오를 제공한다.</p>
+        <p>COCOS 4의 <strong>'AI Native'</strong> 구조는 이러한 개인화된 인터랙티브 콘텐츠를 양산할 수 있는 기술적 기반이 된다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="section-label">09 &mdash; 결론 &amp; 전략적 제언</div>
+
+  <div class="content-card">
+    <div class="card-text">
+      <p>AI와 TypeScript는 H5 게임 산업을 <strong>'수공업'의 영역에서 '정밀 산업'의 영역</strong>으로 끌어올렸다. 개발자는 이제 단순한 코딩 능력을 넘어 AI를 효과적으로 제어하고 검증할 수 있는 아키텍처 설계 능력을 갖추어야 하며, 플랫폼 사업자는 기술적 장벽을 낮추는 동시에 보안과 신뢰를 강화하는 거버넌스를 구축해야 한다.</p>
+    </div>
+  </div>
+
+  <div class="strategy-grid">
+    <div class="strategy-card st1">
+      <div class="strategy-title">AI 도구의 실무 산업화</div>
+      <div class="strategy-desc">AI를 단순 에셋 생성 도구가 아닌, QA 자동화 및 사용자 리텐션 분석을 위한 핵심 데이터 엔진으로 활용</div>
+    </div>
+    <div class="strategy-card st2">
+      <div class="strategy-title">TypeScript 기반의 견고한 설계</div>
+      <div class="strategy-desc">대규모 사용자 수용과 장기 운영을 위해 타입 시스템을 적극 활용하여 기술 부채 최소화</div>
+    </div>
+    <div class="strategy-card st3">
+      <div class="strategy-title">하이브리드 유통 채널 확보</div>
+      <div class="strategy-desc">위챗, 텔레그램, 유튜브의 인스턴트 플레이 기능으로 사용자 획득 비용(CAC)을 낮추고 독자적 생태계 구축</div>
+    </div>
+    <div class="strategy-card st4">
+      <div class="strategy-title">윤리 및 규제 선제 대응</div>
+      <div class="strategy-desc">각국 AI 규제 가이드라인 준수 및 투명한 콘텐츠 라벨링 시스템을 선제적으로 도입하여 사용자 신뢰 확보</div>
+    </div>
+  </div>
+
+  <div class="highlight-box" style="margin-top: 18px;">
+    글로벌 H5 게임 시장은 이제 시작에 불과하다. <strong>2035년까지 2조 달러 이상</strong>의 시장으로 성장할 이 생태계에서 기술적 우위와 전략적 유연성을 동시에 확보하는 기업만이 지속 가능한 성장을 이룰 수 있을 것이다.
+  </div>
+
+  <div class="report-footer">
+    &copy; 2026 &middot; AI & TypeScript H5 Game Industry Report &middot; Deep-Dive Analysis
+  </div>
+
+</div>
+</body>
+</html>
