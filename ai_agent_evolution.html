@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="dark">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI는 어떻게 '진짜 지능'이 되는가 — AI 에이전트 진화의 7단계</title>
+<meta name="robots" content="noindex, nofollow"/>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-858EER7Z5E"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-858EER7Z5E');gtag('config','G-5V5D78TY8V');</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+  :root, [data-theme="dark"] {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1e28;
+    --border: rgba(255,255,255,0.07);
+    --border-subtle: rgba(255,255,255,0.03);
+    --text: #e8eaf0;
+    --text-sub: #c9d1e8;
+    --text-muted: #9ca3af;
+    --muted: #6b7280;
+    --accent-blue: #4f8ef7;
+    --accent-green: #34d399;
+    --accent-purple: #a78bfa;
+    --accent-amber: #fbbf24;
+    --accent-teal: #2dd4bf;
+    --accent-red: #f87171;
+    --accent-rose: #fb7185;
+    --accent-cyan: #22d3ee;
+    --title-em: #8ba8e8;
+    --core-bg: linear-gradient(135deg, rgba(79,142,247,0.07), rgba(45,212,191,0.04));
+    --core-border: rgba(79,142,247,0.18);
+    --glow-color: rgba(79,142,247,0.08);
+    --grid-color: rgba(79,142,247,0.025);
+    --toggle-bg: #1a1e28;
+    --toggle-border: rgba(255,255,255,0.1);
+    --tag-bg: rgba(79,142,247,0.1);
+    --tag-border: rgba(79,142,247,0.2);
+    --quote-bg: rgba(79,142,247,0.06);
+    --quote-border: var(--accent-blue);
+    --step-gradient: linear-gradient(180deg, var(--accent-blue), var(--accent-purple));
+  }
+  [data-theme="light"] {
+    --bg: #f5f6fa;
+    --surface: #ffffff;
+    --surface2: #f0f2f8;
+    --border: rgba(0,0,0,0.08);
+    --border-subtle: rgba(0,0,0,0.04);
+    --text: #111827;
+    --text-sub: #1e2a45;
+    --text-muted: #4b5563;
+    --muted: #9ca3af;
+    --accent-blue: #2563eb;
+    --accent-green: #059669;
+    --accent-purple: #7c3aed;
+    --accent-amber: #d97706;
+    --accent-teal: #0d9488;
+    --accent-red: #dc2626;
+    --accent-rose: #e11d48;
+    --accent-cyan: #0891b2;
+    --title-em: #2563eb;
+    --core-bg: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(13,148,136,0.03));
+    --core-border: rgba(37,99,235,0.15);
+    --glow-color: rgba(37,99,235,0.06);
+    --grid-color: rgba(37,99,235,0.03);
+    --toggle-bg: #ffffff;
+    --toggle-border: rgba(0,0,0,0.1);
+    --tag-bg: rgba(37,99,235,0.08);
+    --tag-border: rgba(37,99,235,0.15);
+    --quote-bg: rgba(37,99,235,0.04);
+    --quote-border: var(--accent-blue);
+    --step-gradient: linear-gradient(180deg, var(--accent-blue), var(--accent-purple));
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { transition: background 0.3s, color 0.3s; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .glow {
+    position: fixed;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 700px;
+    height: 280px;
+    background: radial-gradient(ellipse, var(--glow-color) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 36px 24px 56px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 100;
+    background: var(--toggle-bg);
+    border: 1px solid var(--toggle-border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .theme-toggle:hover { color: var(--text); border-color: var(--accent-blue); }
+  @media print { .theme-toggle { display: none !important; } }
+
+  /* -- HEADER -- */
+  .report-header {
+    padding: 36px 32px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .report-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-teal));
+  }
+
+  .label {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    color: var(--accent-purple);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .report-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.3rem);
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 10px;
+  }
+  .report-title em {
+    font-style: italic;
+    color: var(--accent-blue);
+  }
+
+  .report-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+
+  .report-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 0.7rem;
+    color: var(--muted);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* -- INTRO -- */
+  .intro-card {
+    background: var(--core-bg);
+    border: 1px solid var(--core-border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+  .intro-card h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin-bottom: 14px;
+  }
+  .intro-card p {
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--text-sub);
+  }
+
+  /* -- STEP CARDS -- */
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .step-card:hover { border-color: var(--accent-blue); }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #fff;
+  }
+  .step-num.s1 { background: var(--accent-blue); }
+  .step-num.s2 { background: var(--accent-green); }
+  .step-num.s3 { background: var(--accent-amber); }
+  .step-num.s4 { background: var(--accent-red); }
+  .step-num.s5 { background: var(--accent-purple); }
+  .step-num.s6 { background: var(--accent-teal); }
+  .step-num.s7 { background: var(--accent-rose); }
+
+  .step-en {
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .step-title {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .step-hook {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--accent-blue);
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+
+  .step-body {
+    font-size: 0.87rem;
+    line-height: 1.8;
+    color: var(--text-sub);
+  }
+  .step-body p { margin-bottom: 12px; }
+  .step-body p:last-child { margin-bottom: 0; }
+
+  .step-keywords {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .kw {
+    font-size: 0.68rem;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    border-radius: 10px;
+    padding: 3px 10px;
+    color: var(--accent-blue);
+    font-weight: 500;
+  }
+
+  /* -- FLOW DIAGRAM -- */
+  .flow-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 32px 28px;
+    margin-bottom: 24px;
+  }
+  .flow-section h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .flow-item {
+    text-align: center;
+    padding: 14px 6px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .flow-item .flow-step {
+    font-size: 0.6rem;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .flow-item .flow-ko {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .flow-item .flow-en {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+  }
+
+  .flow-narrative {
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--text-sub);
+    padding: 16px 20px;
+    background: var(--quote-bg);
+    border-left: 3px solid var(--quote-border);
+    border-radius: 0 8px 8px 0;
+  }
+
+  /* -- CONCLUSION -- */
+  .conclusion-card {
+    background: var(--core-bg);
+    border: 1px solid var(--core-border);
+    border-radius: 14px;
+    padding: 32px 28px;
+    margin-bottom: 24px;
+  }
+  .conclusion-card h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--accent-purple);
+    margin-bottom: 14px;
+  }
+  .conclusion-card p {
+    font-size: 0.87rem;
+    line-height: 1.8;
+    color: var(--text-sub);
+    margin-bottom: 12px;
+  }
+  .conclusion-card p:last-child { margin-bottom: 0; }
+  .conclusion-card strong { color: var(--text); }
+
+  .footer-note {
+    text-align: center;
+    font-size: 0.65rem;
+    color: var(--muted);
+    padding-top: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .page { padding: 20px 14px 40px; }
+    .report-header, .step-card, .flow-section, .conclusion-card, .intro-card { padding: 22px 18px; }
+    .flow-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<button class="theme-toggle" onclick="toggleTheme()">
+  <span id="themeIcon">☀️</span>
+  <span id="themeLabel">Light</span>
+</button>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="report-header">
+    <div class="label">AI Agent Evolution Framework</div>
+    <h1 class="report-title">AI는 어떻게 <em>'진짜 지능'</em>이 되는가</h1>
+    <p class="report-subtitle">프롬프트에서 자가 진화까지, AI 에이전트 진화의 7단계</p>
+    <div class="report-meta">
+      <span>2025 기준 분석</span>
+      <span>|</span>
+      <span>현재 상용 AI: 3~4단계</span>
+      <span>|</span>
+      <span>진화 주기: 2~3년</span>
+    </div>
+  </header>
+
+  <!-- INTRO -->
+  <div class="intro-card">
+    <h2>들어가며 — 지금 AI는 어디까지 왔을까?</h2>
+    <p>우리가 매일 쓰는 ChatGPT, Claude, Gemini. 이들은 "질문하면 답하는 도구"처럼 보이지만, 그 안에서는 훨씬 더 복잡한 진화가 진행 중입니다.</p>
+    <p style="margin-top:10px;">AI는 지금 단순한 '대화 도구'에서 <strong style="color:var(--accent-blue)">'스스로 생각하고 행동하는 에이전트'</strong>로 빠르게 변하고 있습니다. 이 흐름을 7단계로 나눠보면, 현재 어디까지 와 있는지, 앞으로 무엇이 달라질지 한눈에 보입니다.</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card">
+    <div class="step-badge">
+      <div class="step-num s1">1</div>
+      <span class="step-en">Chat &amp; Prompt</span>
+    </div>
+    <h3 class="step-title">말을 배우다</h3>
+    <p class="step-hook">"AI에게 질문하면 답이 온다"</p>
+    <div class="step-body">
+      <p>가장 익숙한 단계입니다. 사용자가 질문(Prompt)을 던지면 AI가 답변을 돌려주는 방식. ChatGPT가 처음 등장했을 때 전 세계가 놀란 바로 그 순간입니다.</p>
+      <p>하지만 이 단계는 기억이 없습니다. 대화창을 닫으면 AI는 아무것도 기억하지 못합니다. 마치 만날 때마다 처음 보는 사람처럼요.</p>
+    </div>
+    <div class="step-keywords">
+      <span class="kw">입력 → 출력</span>
+      <span class="kw">일회성</span>
+      <span class="kw">도구로서의 AI</span>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card">
+    <div class="step-badge">
+      <div class="step-num s2">2</div>
+      <span class="step-en">Context</span>
+    </div>
+    <h3 class="step-title">기억을 갖다</h3>
+    <p class="step-hook">"AI가 어제 한 말을 기억하기 시작한다"</p>
+    <div class="step-body">
+      <p>AI가 이전 대화, 업로드한 문서, 사용자의 취향을 기억하는 단계입니다. 단순한 검색 도구에서 '나를 아는 비서'로 바뀌는 첫 번째 전환점입니다.</p>
+      <p>이 단계에서 핵심 병목은 <strong style="color:var(--accent-green)">메모리 용량</strong>입니다. 기억할수록 컴퓨터 자원을 더 많이 씁니다. 최근 구글이 발표한 TurboQuant 같은 기술이 바로 이 '기억 장치'를 5배 더 넓고 저렴하게 만드는 역할을 합니다. 기억력이 좋아질수록 AI는 더 유능한 비서가 됩니다.</p>
+    </div>
+    <div class="step-keywords">
+      <span class="kw">장기 기억</span>
+      <span class="kw">문맥 이해</span>
+      <span class="kw">메모리 효율화</span>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card">
+    <div class="step-badge">
+      <div class="step-num s3">3</div>
+      <span class="step-en">Harness</span>
+    </div>
+    <h3 class="step-title">안전벨트를 차다</h3>
+    <p class="step-hook">"AI의 말을 어디까지 믿을 수 있을까?"</p>
+    <div class="step-body">
+      <p>AI가 행동하기 전에, 그 판단이 옳은지 검증하는 단계입니다. 자율주행차가 도로에 나가기 전 수천 시간의 시뮬레이션을 거치는 것처럼, AI 에이전트도 '안전 테스트'가 필요합니다.</p>
+      <p>이 단계가 제대로 갖춰지지 않으면 아무리 똑똑한 AI도 실제 업무에 쓰기 무섭습니다. 실수가 반복되고, 신뢰를 잃습니다. 반대로 Harness가 탄탄하면, 다음 단계인 실제 행동을 맡길 수 있게 됩니다.</p>
+    </div>
+    <div class="step-keywords">
+      <span class="kw">테스트</span>
+      <span class="kw">신뢰성</span>
+      <span class="kw">위험 관리</span>
+      <span class="kw">AI 거버넌스</span>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-card">
+    <div class="step-badge">
+      <div class="step-num s4">4</div>
+      <span class="step-en">Agent</span>
+    </div>
+    <h3 class="step-title">행동을 시작하다</h3>
+    <p class="step-hook">"AI가 말만 하는 게 아니라 실제로 뭔가를 한다"</p>
+    <div class="step-body">
+      <p>드디어 AI가 '행동'을 시작합니다. 이메일을 대신 쓰고 보내고, 코드를 실행하고, 웹사이트에서 정보를 찾아오고, 캘린더에 일정을 잡습니다.</p>
+      <p>이 단계의 AI를 <strong style="color:var(--accent-red)">'에이전트(Agent)'</strong>라고 부릅니다. 사용자가 "다음 주 회의 일정 잡아줘"라고 말하면, 직접 캘린더를 열고 상대방에게 메일까지 보냅니다. 지시받은 일을 스스로 처리하는 비서의 탄생입니다.</p>
+    </div>
+    <div class="step-keywords">
+      <span class="kw">도구 사용</span>
+      <span class="kw">자동화</span>
+      <span class="kw">실행하는 AI</span>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-card">
+    <div class="step-badge">
+      <div class="step-num s5">5</div>
+      <span class="step-en">Orchestration</span>
+    </div>
+    <h3 class="step-title">팀을 꾸리다</h3>
+    <p class="step-hook">"혼자가 아니라 AI 팀이 함께 일한다"</p>
+    <div class="step-body">
+      <p>한 명의 에이전트가 모든 걸 혼자 하는 데는 한계가 있습니다. 이 단계에서는 여러 전문 AI가 팀처럼 역할을 나눠 복잡한 프로젝트를 완수합니다.</p>
+      <p>예를 들어, 새 제품을 출시한다면 — 기획 AI가 전략을 짜고, 개발 AI가 코드를 작성하고, 검수 AI가 오류를 잡고, 마케팅 AI가 광고 문구를 만듭니다. 이 모든 AI를 지휘하는 <strong style="color:var(--accent-purple)">'오케스트라 지휘자'</strong>가 바로 Orchestration 시스템입니다.</p>
+    </div>
+    <div class="step-keywords">
+      <span class="kw">멀티 에이전트</span>
+      <span class="kw">협업</span>
+      <span class="kw">복잡한 업무 자동화</span>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step-card">
+    <div class="step-badge">
+      <div class="step-num s6">6</div>
+      <span class="step-en">Meta-Engineering</span>
+    </div>
+    <h3 class="step-title">시스템을 설계하다</h3>
+    <p class="step-hook">"AI를 잘 쓰는 게 아니라, AI가 잘 돌아가는 환경을 만든다"</p>
+    <div class="step-body">
+      <p>이 단계부터는 사용자의 역할이 바뀝니다. AI에게 일을 시키는 사람이 아니라, AI 시스템 자체의 구조와 환경을 설계하는 사람이 됩니다.</p>
+      <p>어떤 AI에게 어떤 역할을 주고, 어떤 순서로 연결하고, 어떤 데이터를 먹일지를 결정합니다. 마치 <strong style="color:var(--accent-teal)">공장을 짓는 일</strong>과 같습니다. 공장 안에서 일하는 게 아니라 공장 자체를 설계하는 것입니다.</p>
+    </div>
+    <div class="step-keywords">
+      <span class="kw">시스템 설계</span>
+      <span class="kw">AI 아키텍처</span>
+      <span class="kw">파이프라인 최적화</span>
+    </div>
+  </div>
+
+  <!-- STEP 7 -->
+  <div class="step-card">
+    <div class="step-badge">
+      <div class="step-num s7">7</div>
+      <span class="step-en">Self-Evolving</span>
+    </div>
+    <h3 class="step-title">스스로 진화하다</h3>
+    <p class="step-hook">"AI가 인간 없이도 점점 더 똑똑해진다"</p>
+    <div class="step-body">
+      <p>최종 단계입니다. AI가 스스로 자신의 오류를 발견하고 수정하며, 새로운 데이터를 학습해 시간이 갈수록 더 나아집니다. 인간이 매번 업데이트를 해줄 필요가 없는 상태입니다.</p>
+      <p>이것이 오픈AI, 구글, 앤트로픽이 궁극적으로 향하는 방향이며, 많은 사람들이 <strong style="color:var(--accent-rose)">'AGI(인공일반지능)'</strong>라고 부르는 단계와 맞닿아 있습니다.</p>
+    </div>
+    <div class="step-keywords">
+      <span class="kw">자가 학습</span>
+      <span class="kw">자율 개선</span>
+      <span class="kw">AGI로 가는 길</span>
+    </div>
+  </div>
+
+  <!-- FLOW DIAGRAM -->
+  <div class="flow-section">
+    <h2>전체 흐름 한눈에 보기</h2>
+    <div class="flow-grid">
+      <div class="flow-item">
+        <div class="flow-step">STEP 1</div>
+        <div class="flow-ko">말을 배우다</div>
+        <div class="flow-en">Chat/Prompt</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-step">STEP 2</div>
+        <div class="flow-ko">기억을 갖다</div>
+        <div class="flow-en">Context</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-step">STEP 3</div>
+        <div class="flow-ko">안전벨트</div>
+        <div class="flow-en">Harness</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-step">STEP 4</div>
+        <div class="flow-ko">행동하다</div>
+        <div class="flow-en">Agent</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-step">STEP 5</div>
+        <div class="flow-ko">팀을 꾸리다</div>
+        <div class="flow-en">Orchestration</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-step">STEP 6</div>
+        <div class="flow-ko">시스템 설계</div>
+        <div class="flow-en">Meta-Eng.</div>
+      </div>
+      <div class="flow-item">
+        <div class="flow-step">STEP 7</div>
+        <div class="flow-ko">자가 진화</div>
+        <div class="flow-en">Self-Evolving</div>
+      </div>
+    </div>
+    <div class="flow-narrative">
+      <strong>서사로 읽으면:</strong> 처음엔 말만 했던 AI가 → 기억을 갖고 → 안전성을 검증받고 → 행동을 시작하더니 → 팀을 이루고 → 시스템을 스스로 설계하고 → 결국 스스로 진화한다.
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <div class="conclusion-card">
+    <h2>마무리 — 지금 우리는 몇 단계에 있나?</h2>
+    <p>현재 2025년 기준, 대부분의 상용 AI 서비스는 <strong>3~4단계</strong> 사이에 있습니다. 일부 빅테크 연구소는 5단계 오케스트레이션을 실험 중이고, 6~7단계는 아직 연구 단계입니다.</p>
+    <p>중요한 것은, 이 진화가 10년이 아니라 <strong style="color:var(--accent-amber)">2~3년 단위</strong>로 일어나고 있다는 점입니다. 지금 이 흐름을 이해하는 사람과 그렇지 않은 사람의 차이는, 앞으로 점점 더 커질 것입니다.</p>
+  </div>
+
+  <div class="footer-note">AI Agent Evolution Framework &middot; 2025</div>
+
+</div>
+
+<script>
+function toggleTheme() {
+  const html = document.documentElement;
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  document.getElementById('themeIcon').textContent = next === 'dark' ? '☀️' : '🌙';
+  document.getElementById('themeLabel').textContent = next === 'dark' ? 'Light' : 'Dark';
+  localStorage.setItem('theme', next);
+}
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeIcon').textContent = saved === 'dark' ? '☀️' : '🌙';
+    document.getElementById('themeLabel').textContent = saved === 'dark' ? 'Light' : 'Dark';
+  }
+})();
+</script>
+</body>
+</html>
